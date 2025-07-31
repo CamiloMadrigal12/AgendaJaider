@@ -69,39 +69,16 @@ export default function AgendaSemanal() {
     return { inicio, fin }
   }
 
-  // Función para obtener las actividades base (siempre las mismas)
-  const obtenerActividadesBase = (): Actividad[] => {
-    return [
-      { id: 1, nombre: "Deporte", horas: 5, horasCompletadas: 0 },
-      { id: 2, nombre: "Academia aprendizaje, estudio", horas: 10, horasCompletadas: 0 },
-      { id: 3, nombre: "Política y concejales", horas: 8, horasCompletadas: 0 },
-      {
-        id: 4,
-        nombre: "Administrativos, seguimiento tareas, visitas secretarias, empresas",
-        horas: 12,
-        horasCompletadas: 0,
-      },
-      { id: 5, nombre: "Gestión", horas: 15, horasCompletadas: 0 },
-      { id: 6, nombre: "Conversaciones secretarios", horas: 4, horasCompletadas: 0 },
-      { id: 7, nombre: "Cap nuevos liderazgos - Almuerzo", horas: 3, horasCompletadas: 0 },
-      { id: 8, nombre: "Temas personales", horas: 6, horasCompletadas: 0 },
-      { id: 9, nombre: "Atención comunidad y recorridos barrios", horas: 8, horasCompletadas: 0 },
-      { id: 10, nombre: "Estrateg comunicaciones y eventos equipo político", horas: 6, horasCompletadas: 0 },
-      { id: 11, nombre: "Visitas a casas", horas: 4, horasCompletadas: 0 },
-      { id: 12, nombre: "Sostenimiento equipo", horas: 5, horasCompletadas: 0 },
-    ]
-  }
-
   // Función para crear una nueva semana
   const crearNuevaSemana = (fecha: Date = new Date(), actividadesPersonalizadas?: Actividad[]) => {
     const { inicio, fin } = obtenerSemana(fecha)
     const id = `${inicio.getFullYear()}-W${Math.ceil((inicio.getTime() - new Date(inicio.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000))}`
 
     // Si hay actividades personalizadas (de una semana anterior), usarlas como base
-    // Si no, usar las actividades predeterminadas
+    // Si no, empezar con lista vacía
     const actividadesBase = actividadesPersonalizadas
       ? actividadesPersonalizadas.map((act) => ({ ...act, horasCompletadas: 0 }))
-      : obtenerActividadesBase()
+      : []
 
     return {
       id,
@@ -598,7 +575,7 @@ export default function AgendaSemanal() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
-            Agregar Nueva Actividad
+            Agregar Actividad
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -607,7 +584,7 @@ export default function AgendaSemanal() {
               <Label htmlFor="nueva-actividad">Nombre de la actividad</Label>
               <Input
                 id="nueva-actividad"
-                placeholder="Ej: Reuniones adicionales, Capacitaciones, etc."
+                placeholder="Ej: Deporte, Estudio, Trabajo, Reuniones, etc."
                 value={nuevaActividad}
                 onChange={(e) => setNuevaActividad(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && agregarActividad()}
