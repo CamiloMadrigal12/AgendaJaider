@@ -332,185 +332,458 @@ export default function AgendaSemanal() {
   }, [actividades])
 
   if (!semanaActual) {
-    return <div>Cargando...</div>
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Mi Agenda Semanal</h1>
-        <p className="text-muted-foreground">Gestiona tus actividades y el tiempo dedicado a cada una</p>
-      </div>
+    <div className="min-h-screen bg-gray-50 px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2 px-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mi Agenda Semanal</h1>
+          <p className="text-sm sm:text-base text-gray-600">Gestiona tus actividades y el tiempo dedicado a cada una</p>
+        </div>
 
-      {/* Navegación de semanas */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={irSemanaAnterior} disabled={semanaActualIndex === 0}>
-                <ChevronLeft className="h-4 w-4 mr-2" />
-                Semana Anterior
-              </Button>
+        {/* Navegación de semanas - Responsive */}
+        <Card>
+          <CardContent className="p-3 sm:p-4">
+            {/* Navegación principal */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Controles de navegación */}
+              <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={irSemanaAnterior}
+                  disabled={semanaActualIndex === 0}
+                  className="flex-shrink-0 bg-transparent"
+                >
+                  <ChevronLeft className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Anterior</span>
+                </Button>
 
-              <div className="text-center">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                  <span className="font-semibold text-lg">
-                    Semana {semanaActualIndex + 1} de {semanas.length}
-                  </span>
+                <div className="text-center flex-1 min-w-0">
+                  <div className="flex items-center justify-center gap-2">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
+                    <span className="font-semibold text-sm sm:text-lg truncate">
+                      Semana {semanaActualIndex + 1} de {semanas.length}
+                    </span>
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600 truncate">
+                    {formatearFecha(semanaActual.fechaInicio)} - {formatearFecha(semanaActual.fechaFin)}
+                  </div>
+                  {semanaActual.completada && (
+                    <div className="text-xs sm:text-sm text-green-600 font-medium">✓ Completada</div>
+                  )}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {formatearFecha(semanaActual.fechaInicio)} - {formatearFecha(semanaActual.fechaFin)}
-                </div>
-                {semanaActual.completada && (
-                  <div className="text-sm text-green-600 font-medium">✓ Semana Completada</div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={irSemanaSiguiente}
+                  className="flex-shrink-0 bg-transparent"
+                >
+                  <span className="hidden sm:inline">Siguiente</span>
+                  <ChevronRight className="h-4 w-4 sm:ml-2" />
+                </Button>
+              </div>
+
+              {/* Botones de acción - Stack en móvil */}
+              <div className="flex flex-wrap items-center justify-center gap-2 w-full sm:w-auto">
+                <Button variant="outline" size="sm" onClick={guardarSemana}>
+                  <Save className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">Guardar</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={resetearSemana}
+                  className="text-orange-600 hover:text-orange-700 bg-transparent"
+                >
+                  <RotateCcw className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">Reset</span>
+                </Button>
+
+                <Button variant="outline" size="sm" onClick={crearSemanaNueva}>
+                  <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">Nueva</span>
+                </Button>
+
+                {semanas.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setMostrarConfirmacionEliminar(semanaActualIndex)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm">Eliminar</span>
+                  </Button>
                 )}
-              </div>
-
-              <Button variant="outline" onClick={irSemanaSiguiente}>
-                Semana Siguiente
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={guardarSemana}>
-                <Save className="h-4 w-4 mr-2" />
-                Guardar
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetearSemana}
-                className="text-orange-600 hover:text-orange-700 bg-transparent"
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Resetear
-              </Button>
-
-              <Button variant="outline" size="sm" onClick={crearSemanaNueva}>
-                <Plus className="h-4 w-4 mr-2" />
-                Nueva Semana
-              </Button>
-
-              {/* Botón para eliminar semana actual */}
-              {semanas.length > 1 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setMostrarConfirmacionEliminar(semanaActualIndex)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar Semana
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Modal de confirmación para eliminar semana */}
-      {mostrarConfirmacionEliminar !== null && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-red-800">Confirmar Eliminación</h3>
-                <p className="text-sm text-red-700 mt-1">
-                  ¿Estás seguro de que quieres eliminar la Semana {mostrarConfirmacionEliminar + 1}?
-                  <br />
-                  <span className="font-medium">
-                    ({formatearFecha(semanas[mostrarConfirmacionEliminar].fechaInicio)} -{" "}
-                    {formatearFecha(semanas[mostrarConfirmacionEliminar].fechaFin)})
-                  </span>
-                </p>
-                <p className="text-xs text-red-600 mt-2">
-                  Esta acción no se puede deshacer. Se perderá todo el progreso de esta semana.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setMostrarConfirmacionEliminar(null)}
-                  className="text-gray-600"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => eliminarSemana(mostrarConfirmacionEliminar)}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Eliminar
-                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Resumen de semanas */}
-      {semanas.length > 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Historial de Semanas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {semanas.map((semana, index) => {
-                const totalHorasSemana = semana.actividades.reduce((sum, act) => sum + act.horas, 0)
-                const totalCompletadasSemana = semana.actividades.reduce((sum, act) => sum + act.horasCompletadas, 0)
-                const progresoSemana = totalHorasSemana > 0 ? (totalCompletadasSemana / totalHorasSemana) * 100 : 0
-
-                return (
-                  <div
-                    key={semana.id}
-                    className={`relative p-3 border rounded-lg transition-colors ${
-                      index === semanaActualIndex ? "border-blue-500 bg-blue-50" : "hover:bg-muted/50"
-                    }`}
+        {/* Modal de confirmación para eliminar semana */}
+        {mostrarConfirmacionEliminar !== null && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-red-800">Confirmar Eliminación</h3>
+                  <p className="text-sm text-red-700 mt-1">
+                    ¿Eliminar la Semana {mostrarConfirmacionEliminar + 1}?
+                    <br />
+                    <span className="font-medium text-xs sm:text-sm">
+                      ({formatearFecha(semanas[mostrarConfirmacionEliminar].fechaInicio)} -{" "}
+                      {formatearFecha(semanas[mostrarConfirmacionEliminar].fechaFin)})
+                    </span>
+                  </p>
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setMostrarConfirmacionEliminar(null)}
+                    className="flex-1 sm:flex-none"
                   >
-                    {/* Botón de eliminar en la esquina */}
-                    {semanas.length > 1 && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setMostrarConfirmacionEliminar(index)
-                        }}
-                        className="absolute top-1 right-1 h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    )}
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => eliminarSemana(mostrarConfirmacionEliminar)}
+                    className="bg-red-600 hover:bg-red-700 text-white flex-1 sm:flex-none"
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
+        {/* Historial de semanas - Responsive grid */}
+        {semanas.length > 1 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+                Historial de Semanas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+                {semanas.map((semana, index) => {
+                  const totalHorasSemana = semana.actividades.reduce((sum, act) => sum + act.horas, 0)
+                  const totalCompletadasSemana = semana.actividades.reduce((sum, act) => sum + act.horasCompletadas, 0)
+                  const progresoSemana = totalHorasSemana > 0 ? (totalCompletadasSemana / totalHorasSemana) * 100 : 0
+
+                  return (
                     <div
-                      className="cursor-pointer"
+                      key={semana.id}
+                      className={`relative p-2 sm:p-3 border rounded-lg transition-colors cursor-pointer ${
+                        index === semanaActualIndex ? "border-blue-500 bg-blue-50" : "hover:bg-gray-50"
+                      }`}
                       onClick={() => {
                         guardarSemana()
                         setSemanaActualIndex(index)
                         setActividades([...semana.actividades])
                       }}
                     >
-                      <div className="text-sm font-medium">Semana {index + 1}</div>
-                      <div className="text-xs text-muted-foreground">{formatearFecha(semana.fechaInicio)}</div>
+                      {semanas.length > 1 && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setMostrarConfirmacionEliminar(index)
+                          }}
+                          className="absolute top-1 right-1 h-5 w-5 sm:h-6 sm:w-6 p-0 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-2 w-2 sm:h-3 sm:w-3" />
+                        </Button>
+                      )}
+
+                      <div className="text-xs sm:text-sm font-medium truncate pr-6">Semana {index + 1}</div>
+                      <div className="text-xs text-gray-600 truncate">{formatearFecha(semana.fechaInicio)}</div>
                       <div className="mt-2">
-                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div className="w-full bg-gray-200 rounded-full h-1 sm:h-1.5">
                           <div
-                            className={`h-1.5 rounded-full ${obtenerColorProgreso(progresoSemana)}`}
+                            className={`h-1 sm:h-1.5 rounded-full ${obtenerColorProgreso(progresoSemana)}`}
                             style={{ width: `${Math.min(progresoSemana, 100)}%` }}
                           ></div>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {progresoSemana.toFixed(0)}% completado
+                        <div className="text-xs text-gray-600 mt-1">{progresoSemana.toFixed(0)}%</div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Resumen de horas - Responsive grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <Card>
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">{totalHoras}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Planificadas</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{totalCompletadas}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Completadas</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600">{progresoGeneral.toFixed(1)}%</div>
+              <div className="text-xs sm:text-sm text-gray-600">Progreso</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-4 text-center">
+              <div
+                className={`text-xl sm:text-2xl font-bold ${horasRestantes >= 0 ? "text-green-600" : "text-red-600"}`}
+              >
+                {horasRestantes}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600">Disponibles</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Barra de progreso general */}
+        <Card>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+              <span className="font-medium text-sm sm:text-base">Progreso Semanal</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
+              <div
+                className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${obtenerColorProgreso(progresoGeneral)}`}
+                style={{ width: `${Math.min(progresoGeneral, 100)}%` }}
+              ></div>
+            </div>
+            <div className="text-xs sm:text-sm text-gray-600 mt-1">
+              {totalCompletadas} de {totalHoras} horas completadas
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Agregar nueva actividad - Responsive form */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+              Agregar Actividad
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1">
+                <Label htmlFor="nueva-actividad" className="text-sm">
+                  Nombre de la actividad
+                </Label>
+                <Input
+                  id="nueva-actividad"
+                  placeholder="Ej: Deporte, Estudio, Trabajo..."
+                  value={nuevaActividad}
+                  onChange={(e) => setNuevaActividad(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && agregarActividad()}
+                  className="mt-1"
+                />
+              </div>
+              <div className="w-full sm:w-32">
+                <Label htmlFor="nuevas-horas" className="text-sm">
+                  Horas/semana
+                </Label>
+                <Input
+                  id="nuevas-horas"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="0"
+                  value={nuevasHoras}
+                  onChange={(e) => setNuevasHoras(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && agregarActividad()}
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  onClick={agregarActividad}
+                  disabled={!nuevaActividad.trim() || !nuevasHoras.trim()}
+                  className="w-full sm:w-auto"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Agregar
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Lista de actividades - Responsive */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+              Mis Actividades ({actividades.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 sm:space-y-4">
+              {actividades.map((actividad) => {
+                const progreso = calcularProgreso(actividad)
+                const horasFaltantes = Math.max(actividad.horas - actividad.horasCompletadas, 0)
+
+                return (
+                  <div key={actividad.id} className="p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    {/* Header de la actividad */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-base sm:text-lg truncate">{actividad.nombre}</h3>
+                        <div className="text-xs sm:text-sm text-gray-600">Meta: {actividad.horas} horas/semana</div>
+                      </div>
+
+                      {/* Controles de edición */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {editandoId === actividad.id ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              value={valorTemporal}
+                              onChange={(e) => setValorTemporal(e.target.value)}
+                              className="w-16 sm:w-20 text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") guardarEdicion(actividad.id)
+                                if (e.key === "Escape") cancelarEdicion()
+                              }}
+                              autoFocus
+                            />
+                            <Button size="sm" variant="ghost" onClick={() => guardarEdicion(actividad.id)}>
+                              <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={cancelarEdicion}>
+                              <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-right">
+                              <div className="font-semibold text-sm">{actividad.horas}h</div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => iniciarEdicion(actividad.id, actividad.horas)}
+                            >
+                              <Edit3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                          </>
+                        )}
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => eliminarActividad(actividad.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Barra de progreso */}
+                    <div className="mb-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs sm:text-sm font-medium">Progreso</span>
+                        <span className="text-xs sm:text-sm text-gray-600">{progreso.toFixed(1)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
+                        <div
+                          className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${obtenerColorProgreso(progreso)}`}
+                          style={{ width: `${Math.min(progreso, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Controles de horas */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-2">
+                          <Target className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                          <span className="text-xs sm:text-sm">
+                            <span className="font-semibold text-green-600">{actividad.horasCompletadas}</span>{" "}
+                            completadas
+                          </span>
                         </div>
+
+                        {/* Botones para agregar/quitar horas */}
+                        {agregandoHoras === actividad.id ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              placeholder="Horas"
+                              value={horasAAgregar}
+                              onChange={(e) => setHorasAAgregar(e.target.value)}
+                              className="w-16 sm:w-20 text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") agregarHorasCompletadas(actividad.id)
+                                if (e.key === "Escape") cancelarAgregarHoras()
+                              }}
+                              autoFocus
+                            />
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => agregarHorasCompletadas(actividad.id)}
+                              disabled={!horasAAgregar.trim()}
+                            >
+                              <PlusCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => restarHorasCompletadas(actividad.id)}
+                              disabled={!horasAAgregar.trim()}
+                            >
+                              <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={cancelarAgregarHoras}>
+                              <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => iniciarAgregarHoras(actividad.id)}
+                            className="text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
+                          >
+                            <PlusCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                            Agregar
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="text-xs sm:text-sm text-gray-600">
+                        {horasFaltantes > 0 ? (
+                          <span className="text-orange-600">Faltan: {horasFaltantes}h</span>
+                        ) : (
+                          <span className="text-green-600">¡Completada!</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -519,276 +792,21 @@ export default function AgendaSemanal() {
             </div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Resumen de horas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{totalHoras}</div>
-            <div className="text-sm text-muted-foreground">Horas planificadas</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{totalCompletadas}</div>
-            <div className="text-sm text-muted-foreground">Horas completadas</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600">{progresoGeneral.toFixed(1)}%</div>
-            <div className="text-sm text-muted-foreground">Progreso general</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className={`text-2xl font-bold ${horasRestantes >= 0 ? "text-green-600" : "text-red-600"}`}>
-              {horasRestantes}
-            </div>
-            <div className="text-sm text-muted-foreground">Horas disponibles</div>
-          </CardContent>
-        </Card>
+        {/* Advertencia si se exceden las horas */}
+        {horasRestantes < 0 && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-start gap-2 text-red-700">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 mt-0.5 flex-shrink-0" />
+                <span className="font-medium text-sm sm:text-base">
+                  ¡Atención! Has asignado {Math.abs(horasRestantes)} horas más de las disponibles en una semana.
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
-
-      {/* Barra de progreso general */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
-            <span className="font-medium">Progreso de la Semana Actual</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
-            <div
-              className={`h-3 rounded-full transition-all duration-300 ${obtenerColorProgreso(progresoGeneral)}`}
-              style={{ width: `${Math.min(progresoGeneral, 100)}%` }}
-            ></div>
-          </div>
-          <div className="text-sm text-muted-foreground mt-1">
-            {totalCompletadas} de {totalHoras} horas completadas
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Agregar nueva actividad */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Agregar Actividad
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Label htmlFor="nueva-actividad">Nombre de la actividad</Label>
-              <Input
-                id="nueva-actividad"
-                placeholder="Ej: Deporte, Estudio, Trabajo, Reuniones, etc."
-                value={nuevaActividad}
-                onChange={(e) => setNuevaActividad(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && agregarActividad()}
-              />
-            </div>
-            <div className="w-32">
-              <Label htmlFor="nuevas-horas">Horas/semana</Label>
-              <Input
-                id="nuevas-horas"
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder="0"
-                value={nuevasHoras}
-                onChange={(e) => setNuevasHoras(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && agregarActividad()}
-              />
-            </div>
-            <div className="flex items-end">
-              <Button onClick={agregarActividad} disabled={!nuevaActividad.trim() || !nuevasHoras.trim()}>
-                <Plus className="h-4 w-4 mr-2" />
-                Agregar
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de actividades */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Mis Actividades ({actividades.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {actividades.map((actividad) => {
-              const progreso = calcularProgreso(actividad)
-              const horasFaltantes = Math.max(actividad.horas - actividad.horasCompletadas, 0)
-
-              return (
-                <div key={actividad.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-lg">{actividad.nombre}</h3>
-                      <div className="text-sm text-muted-foreground">Meta: {actividad.horas} horas/semana</div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {/* Editar meta de horas */}
-                      {editandoId === actividad.id ? (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.5"
-                            value={valorTemporal}
-                            onChange={(e) => setValorTemporal(e.target.value)}
-                            className="w-20"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") guardarEdicion(actividad.id)
-                              if (e.key === "Escape") cancelarEdicion()
-                            }}
-                            autoFocus
-                          />
-                          <span className="text-sm text-muted-foreground">h/sem</span>
-                          <Button size="sm" variant="ghost" onClick={() => guardarEdicion(actividad.id)}>
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={cancelarEdicion}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-right">
-                            <div className="font-semibold">{actividad.horas} horas</div>
-                            <div className="text-sm text-muted-foreground">meta</div>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => iniciarEdicion(actividad.id, actividad.horas)}
-                          >
-                            <Edit3 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => eliminarActividad(actividad.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Barra de progreso */}
-                  <div className="mb-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm font-medium">Progreso</span>
-                      <span className="text-sm text-muted-foreground">{progreso.toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-300 ${obtenerColorProgreso(progreso)}`}
-                        style={{ width: `${Math.min(progreso, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* Horas completadas y controles */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Target className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">
-                          <span className="font-semibold text-green-600">{actividad.horasCompletadas}</span> completadas
-                        </span>
-                      </div>
-
-                      {/* Botones para agregar/quitar horas */}
-                      {agregandoHoras === actividad.id ? (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.5"
-                            placeholder="Horas"
-                            value={horasAAgregar}
-                            onChange={(e) => setHorasAAgregar(e.target.value)}
-                            className="w-20"
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") agregarHorasCompletadas(actividad.id)
-                              if (e.key === "Escape") cancelarAgregarHoras()
-                            }}
-                            autoFocus
-                          />
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => agregarHorasCompletadas(actividad.id)}
-                            disabled={!horasAAgregar.trim()}
-                          >
-                            <PlusCircle className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => restarHorasCompletadas(actividad.id)}
-                            disabled={!horasAAgregar.trim()}
-                          >
-                            <MinusCircle className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={cancelarAgregarHoras}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => iniciarAgregarHoras(actividad.id)}
-                          className="text-blue-600 hover:text-blue-700"
-                        >
-                          <PlusCircle className="h-4 w-4 mr-1" />
-                          Agregar horas
-                        </Button>
-                      )}
-                    </div>
-
-                    <div className="text-sm text-muted-foreground">
-                      {horasFaltantes > 0 ? (
-                        <span className="text-orange-600">Faltan: {horasFaltantes} horas</span>
-                      ) : (
-                        <span className="text-green-600">¡Meta completada!</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Advertencia si se exceden las horas */}
-      {horasRestantes < 0 && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-red-700">
-              <Clock className="h-5 w-5" />
-              <span className="font-medium">
-                ¡Atención! Has asignado {Math.abs(horasRestantes)} horas más de las disponibles en una semana.
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
